@@ -84,7 +84,7 @@ def get_article(func=None, can_read=True, can_write=False,
             try:
                 urlpath = models.URLPath.get_by_path(path, select_related=True)
             except NoRootURL:
-                if request.user.is_authenticated:
+                if request.user.is_anonymous():
                     if settings.ONLY_ADMIN_CAN_CREATE and not request.user.is_admin:
                         raise models.URLPath.DoesNotExist('Only admin can create articles.')
                 else:
@@ -93,7 +93,7 @@ def get_article(func=None, can_read=True, can_write=False,
                 return redirect('wiki:root_create')
             except models.URLPath.DoesNotExist:
                 try:
-                    if request.user.is_authenticated:
+                    if request.user.is_anonymous():
                         if settings.ONLY_ADMIN_CAN_CREATE and not request.user.is_admin:
                             raise models.URLPath.DoesNotExist('Only admin can create articles.')
                     else:
