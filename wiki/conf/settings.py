@@ -106,6 +106,9 @@ else:
     LOGOUT_URL = getattr( django_settings, "LOGOUT_URL", "/" )
     SIGNUP_URL = getattr( django_settings, "WIKI_SIGNUP_URL", "/" )
 
+# Prohibit non-admin users from creating new articles, if the value is True.
+ONLY_ADMIN_CAN_CREATE = getattr( django_settings, 'WIKI_ONLY_ADMIN_CAN_CREATE', True)
+
 ##################
 # OTHER SETTINGS #
 ##################

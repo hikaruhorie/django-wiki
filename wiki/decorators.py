@@ -84,13 +84,19 @@ def get_article(func=None, can_read=True, can_write=False,
             try:
                 urlpath = models.URLPath.get_by_path(path, select_related=True)
             except NoRootURL:
-                return redirect('wiki:root_create')
+                if request.user.is_admin or not settings.ONLY_ADMIN_CAN_CREATE:
+                    return redirect('wiki:root_create')
+                else:
+                    raise models.URLPath.DoesNotExist('Only admin can create articles.')
             except models.URLPath.DoesNotExist:
                 try:
-                    pathlist = filter(lambda x: x!="", path.split("/"),)
-                    path = "/".join(pathlist[:-1])
-                    parent = models.URLPath.get_by_path(path)
-                    return HttpResponseRedirect(reverse("wiki:create", kwargs={'path': parent.path,}) + "?slug=%s" % pathlist[-1])
+                    if request.user.is_admin or not settings.ONLY_ADMIN_CAN_CREATE:
+                        pathlist = filter(lambda x: x!="", path.split("/"),)
+                        path = "/".join(pathlist[:-1])
+                        parent = models.URLPath.get_by_path(path)
+                        return HttpResponseRedirect(reverse("wiki:create", kwargs={'path': parent.path,}) + "?slug=%s" % pathlist[-1])
+                    else:
+                        raise models.URLPath.DoesNotExist('Only admin can create articles.')
                 except models.URLPath.DoesNotExist:
                     c = RequestContext(request, {'error_type' : 'ancestors_missing'})
                     return HttpResponseNotFound(render_to_string("wiki/error.html", context_instance=c))
